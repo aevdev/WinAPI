@@ -1,6 +1,14 @@
 //ListBox
+#define _CRT_SECURE_NO_WARNINGS //для sprintf()
 #include<Windows.h> 
+#include<cstdio> //для sprintf()
 #include"resource.h"
+
+CONST CHAR* string[] =
+{
+	//Вот эти строки мы добавил в ListBox
+	"This", "is", "my", "first", "List","Box"
+};
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -49,16 +57,47 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
 	{
 	case WM_INITDIALOG: //Это сообщение отправляется в окно при его создании.
+	{
+
+		HWND hListBox = GetDlgItem(hwnd, IDC_LIST1);
+		//GetDlgItem(hwnd, IDC_LIST1); возвращает HWND элемента окна по ID ресурса нужного элемента
+		for (int i = 0; i < sizeof(string) / sizeof(string[0]); ++i)
+		{
+			SendMessage(hListBox, LB_ADDSTRING, 0, (LPARAM)string[i]);
+			//LB_ADDSTRING - добавляет указанную строку в ListBox
+		}
 		break;
+	}
 	case WM_COMMAND: //Это сообщение обрабатывает нажатие на кнопки и другие элементы интерфейса окна.
 		switch (LOWORD(wParam))
 		{
 		case IDOK:
+		{
+			CONST INT SIZE = 256;
+			CHAR sz_buffer[SIZE] = {}; //В эту строку мы скопируем выделенную строку ListBox'а.
+			//А эту строку мы будем отображать в MessageBox:
+			CHAR sz_message[SIZE] = {};
+
+			HWND hListBox = GetDlgItem(hwnd, IDC_LIST1);
+			int index = SendMessage(hListBox, LB_GETCURSEL, 0, 0); //Получаем числовой индекс выделенного элемента ListBox
+			SendMessage(hListBox, LB_GETTEXT, index, (LPARAM)sz_buffer);
+			sprintf(sz_message, "You have chosen № %d with the value of \"%s\".", index, sz_buffer);
+			//Функция sprintf() выполняет форматирование строк
+			//sz_message - Это буфер, в который сохранится отформатированная строка.
+			//"Вы выбрали..." - это шаблон строки, т.е. то, как она должна выглядеть
+			//%d - вставить в шаблонную строку десятичное целое число (decimal)
+			//%s - вставить в шаблонную строку подстроку.
+			//Все вставляемые значения перечислены далее в передаваемых параметрах: index, sz_buffer....
+			//количество параметров функции sprintf() неограниченно
+			//функция sprintf() позволят вставлять в строку какие угодно значения
+			MessageBox(hwnd, sz_message, "Info", MB_OK | MB_ICONINFORMATION);	// | побитовое ИЛИ
+		}
 			break;
 		case IDCANCEL: EndDialog(hwnd, 0); break;
 		}
 		break;
 	case WM_CLOSE: EndDialog(hwnd, 0); break;
+
 	}
 	return FALSE;
 }
