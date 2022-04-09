@@ -58,7 +58,6 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_INITDIALOG: //Это сообщение отправляется в окно при его создании.
 	{
-
 		HWND hListBox = GetDlgItem(hwnd, IDC_LIST1);
 		//GetDlgItem(hwnd, IDC_LIST1); возвращает HWND элемента окна по ID ресурса нужного элемента
 		for (int i = 0; i < sizeof(string) / sizeof(string[0]); ++i)
